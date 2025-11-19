@@ -49,7 +49,7 @@ pyinstaller
 3. Choose output directory (defaults to `outputs/` folder)
 4. Check desired output options:
    - ☑ Generate Excel
-   - ☑ Generate Mermaid Diagram
+   - ☑ Generate Lineage Diagram
 5. Click "Process Workbook"
 6. Find results in the output folder
 
