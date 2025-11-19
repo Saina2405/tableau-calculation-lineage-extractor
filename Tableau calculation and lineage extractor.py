@@ -432,8 +432,14 @@ print(f"Total nodes: {len(nodes)}")
 print(f"Total edges: {len(edges)}")
 print("Nodes and edges prepared for lineage diagram")
 
-# Generate interactive HTML lineage diagram using Vis.js library
+# Generate interactive HTML lineage diagram using Vis.js library (bundled locally)
 # Creates a hierarchical network visualization with tooltips showing formulas
+
+# Read the local Vis.js library file
+script_dir = os.path.dirname(os.path.abspath(__file__))
+visjs_path = os.path.join(script_dir, 'vis-network.min.js')
+with open(visjs_path, 'r', encoding='utf-8') as f:
+    visjs_content = f.read()
 
 html_base = """
 <!DOCTYPE html>
@@ -442,7 +448,9 @@ html_base = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>""" + tableau_name_substring + """ Calculation Lineage</title>
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script type="text/javascript">
+""" + visjs_content + """
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -644,5 +652,6 @@ print("HTML content successfully written to {}".format(file_path))
 # Open the HTML file in the default web browser
 webbrowser.open('file://' + os.path.realpath(file_path))
 
-print("\n✓ Interactive lineage diagram created and opened in browser")
+print("\n✓ Interactive lineage diagram created and opened in browser (OFFLINE MODE)")
+print("✓ Vis.js library bundled locally - no internet required")
 

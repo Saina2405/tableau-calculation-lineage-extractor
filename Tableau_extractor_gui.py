@@ -431,7 +431,13 @@ class TableauExtractorGUI:
             nodes_json = json.dumps(nodes)
             edges_json = json.dumps(edges)
             
-            # Generate interactive HTML lineage diagram using Vis.js
+            # Generate interactive HTML lineage diagram using Vis.js (bundled locally)
+            # Read the local Vis.js library file
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            visjs_path = os.path.join(script_dir, 'vis-network.min.js')
+            with open(visjs_path, 'r', encoding='utf-8') as f:
+                visjs_content = f.read()
+            
             html_base = """
 <!DOCTYPE html>
 <html lang="en">
@@ -439,7 +445,9 @@ class TableauExtractorGUI:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>""" + tableau_name_substring + """ Calculation Lineage</title>
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script type="text/javascript">
+""" + visjs_content + """
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;

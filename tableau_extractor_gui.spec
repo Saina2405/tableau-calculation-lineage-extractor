@@ -5,7 +5,7 @@ a = Analysis(
     ['tableau_extractor_gui.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('vis-network.min.js', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -35,4 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='NONE',
 )

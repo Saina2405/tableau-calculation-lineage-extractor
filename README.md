@@ -76,6 +76,11 @@ pyinstaller
 ❌ **No credentials**: Does not access database passwords or connection strings  
 ❌ **No external calls**: Operates entirely offline on local files  
 
+### Offline Operation
+✅ **Lineage diagrams work offline**: Vis.js library bundled locally - no internet required  
+✅ **Self-contained HTML**: All diagram files include embedded visualization library  
+✅ **Complete privacy**: No data transmitted to external servers  
+
 
 ## 🚀 Quick Start
 
@@ -112,10 +117,20 @@ python "Tableau calculation and lineage extractor.py"
 | `Tableau calculation and lineage extractor.py` | Standalone command-line Python script (v3.1) |
 | `Tableau calculation and lineage extractor.ipynb` | Jupyter Notebook version with markdown documentation |
 | `Excelcreator.py` | Helper module for Excel formatting with xlsxwriter |
+| `vis-network.min.js` | Vis.js library for interactive diagrams (bundled locally for offline use) |
 | `tableau_extractor_gui.spec` | PyInstaller build configuration for GUI executable |
 | `Tableau calculation and lineage extractor.spec` | PyInstaller build configuration for main script |
 | `inputs/` | Folder for Tableau workbook files (.twb/.twbx) |
 | `outputs/` | Folder for generated Excel and HTML files |
+
+
+
+
+
+ 
+
+
+
 
 
 
