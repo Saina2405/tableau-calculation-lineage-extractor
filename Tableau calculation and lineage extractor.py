@@ -113,7 +113,7 @@ calcID2 = []
 calcNames = []
 
 c = 0
-
+    
 for datasource in TWBX_Workbook.datasources:
     datasource_name = datasource.name
     datasource_caption = datasource.caption if datasource.caption else datasource_name
@@ -151,8 +151,6 @@ for datasource in TWBX_Workbook.datasources:
 
         c += 1
         collator.append(dict_temp)
-
-
 
 def default_to_friendly_names2(formulaList,fieldToConvert, dictToUse):
 
@@ -272,16 +270,19 @@ for i in abc:
 
 # Map default fields to short abbreviations (AA, AB, etc.) for the diagram
 # Filter to only include fields that are used in the report
-def_fields = df1[(df1['Type'] == 'Default_Field') & (df1['Used_In_Report'] == 'Yes')]['Field_ID'].copy().apply(remove_sp_char_leave_undescore_square_brackets)
+def_fields_df = df1[(df1['Type'] == 'Default_Field') & (df1['Used_In_Report'] == 'Yes')][['Field_ID', 'Field_Name']].copy()
+def_fields = def_fields_df['Field_ID'].apply(remove_sp_char_leave_undescore_square_brackets)
+def_fields_original_names = def_fields_df['Field_Name'].tolist()  # Keep original names for display
 
 print(f"Default fields used in report: {len(def_fields)}")
 
 abc_touse = collated_abc[0:len(def_fields)]
 
-def_fields_final = pd.DataFrame(list(zip(def_fields.tolist(), abc_touse)))
-def_fields_final['aa'] = def_fields_final.apply(lambda row: first_char_checker(row[0]), axis=1)
+def_fields_final = pd.DataFrame(list(zip(def_fields.tolist(), abc_touse, def_fields_original_names)), columns=['cleaned', 'abbrev', 'original'])
+def_fields_final['aa'] = def_fields_final['cleaned'].apply(lambda x: first_char_checker(x))
 
-mapping_dict_friendly_names = dict(zip(def_fields_final[0].tolist(), abc_touse))
+mapping_dict_friendly_names = dict(zip(def_fields_final['cleaned'].tolist(), abc_touse))
+mapping_dict_original_names = dict(zip(abc_touse, def_fields_final['original'].tolist()))  # Map abbrev to original names
 mapping_dict = dict(zip(def_fields_final['aa'].tolist(), abc_touse))
 
 # Extract calculated fields and parameters, map them to abbreviated IDs (x___AA, x___AB, etc.)
@@ -293,6 +294,9 @@ print(f"Calculated fields used in report: {len(created_calc)}")
 
 nlsi = ['x___' + i for i in collated_abc]
 nlsi_to_use = nlsi[0:len(created_calc)]
+
+# Store original field names BEFORE cleaning
+created_calc['field_name_original'] = created_calc['field_name'].copy()
 
 created_calc['field_name'] = created_calc['field_name'].apply(remove_sp_char_leave_undescore_square_brackets)
 created_calc['aa'] = created_calc.apply(lambda row: first_char_checker(row['field_id']), axis=1)
@@ -314,7 +318,8 @@ def differentiate_duplicates(series):
 created_calc['field_name'] = differentiate_duplicates(created_calc['field_name'])
 
 # Create final mapping of friendly field names to abbreviated IDs
-calc_map_dict_friendly_names = dict(zip(created_calc['field_name'], created_calc['shorthand_abc']))
+calc_map_dict_friendly_names = dict(zip(created_calc['field_name'], created_calc['shorthand_abc'] ))
+calc_map_dict_original_names = dict(zip(created_calc['shorthand_abc'], created_calc['field_name_original']))  # Map abbrev to original names
 
 # Identify dependencies between fields by analyzing which fields are used in calculation formulas
 def create_lineage_paths(df, field_type):
@@ -373,32 +378,32 @@ nodes = []
 edges = []
 node_ids = set()
 
-# Add default fields as nodes
-for i, d in mapping_dict_friendly_names.items():
-    if d not in node_ids:
+# Add default fields as nodes (use original names for labels)
+for abbrev, original_name in mapping_dict_original_names.items():
+    if abbrev not in node_ids:
         nodes.append({
-            'id': d,
-            'label': i,
+            'id': abbrev,
+            'label': original_name,
             'group': 'default',
-            'title': f'Default Field: {i}'
+            'title': f'Default Field: {original_name}'
         })
-        node_ids.add(d)
+        node_ids.add(abbrev)
 
-# Add calculated fields as nodes
-for i, d in calc_map_dict_friendly_names.items():
-    if d not in node_ids:
-        calc_row = created_calc[created_calc['field_name'] == i]
+# Add calculated fields as nodes (use original names for labels)
+for abbrev, original_name in calc_map_dict_original_names.items():
+    if abbrev not in node_ids:
+        calc_row = created_calc[created_calc['shorthand_abc'] == abbrev]
         calc_formula = ''
         if not calc_row.empty and calc_row['field_calculation'].values[0]:
             calc_formula = str(calc_row['field_calculation'].values[0])
         
         nodes.append({
-            'id': d,
-            'label': i,
+            'id': abbrev,
+            'label': original_name,
             'group': 'calculated',
-            'title': f'{i}\n\nFormula:\n{calc_formula}'
+            'title': f'{original_name}\n\nFormula:\n{calc_formula}'
         })
-        node_ids.add(d)
+        node_ids.add(abbrev)
 
 # Build edges from the collators
 for item in t_collator_def_fields:

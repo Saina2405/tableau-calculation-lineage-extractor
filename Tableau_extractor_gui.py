@@ -252,10 +252,17 @@ class TableauExtractorGUI:
             # Clean up field names
             df1['Field_Name'] = df1['Field_Name'].str.replace(r'[\[\]]', '', regex=True)
             
-            # Add column to indicate if field is used in any worksheet
-            df1['Used_In_Report'] = df1['Worksheets'].apply(lambda x: 'Yes' if x and len(str(x).strip()) > 0 else 'No')
+            # Clean the Worksheets column - convert list to comma-separated string without brackets
+            def format_worksheets(ws_list):
+                if ws_list and len(ws_list) > 0:
+                    # Join worksheet names with comma and space
+                    return ', '.join(ws_list)
+                return ''
             
-            df1['Worksheets'] = df1['Worksheets'].astype(str).str.replace(r'[\[\]]', '', regex=True).str.replace("'", '', regex=False)
+            df1['Worksheets'] = df1['Worksheets'].apply(format_worksheets)
+            
+            # Add column to indicate if field is used in any worksheet
+            df1['Used_In_Report'] = df1['Worksheets'].apply(lambda x: 'Yes' if x else 'No')
             
             return df1, df_API_all
             
@@ -289,13 +296,16 @@ class TableauExtractorGUI:
                     collated_abc.append(i+j)
             
             # Process default fields - filter to only include fields used in the report
-            def_fields = df[(df['Type'] == 'Default_Field') & (df['Used_In_Report'] == 'Yes')]['Field_ID'].copy().apply(remove_sp_char_leave_undescore_square_brackets)
+            def_fields_df = df[(df['Type'] == 'Default_Field') & (df['Used_In_Report'] == 'Yes')][['Field_ID', 'Field_Name']].copy()
+            def_fields = def_fields_df['Field_ID'].apply(remove_sp_char_leave_undescore_square_brackets)
+            def_fields_original_names = def_fields_df['Field_Name'].tolist()  # Keep original names for display
             abc_touse = collated_abc[0:len(def_fields)]
             
-            def_fields_final = pd.DataFrame(list(zip(def_fields.tolist(), abc_touse)))
-            def_fields_final['aa'] = def_fields_final.apply(lambda row: first_char_checker(row[0]), axis=1)
+            def_fields_final = pd.DataFrame(list(zip(def_fields.tolist(), abc_touse, def_fields_original_names)), columns=['cleaned', 'abbrev', 'original'])
+            def_fields_final['aa'] = def_fields_final['cleaned'].apply(lambda x: first_char_checker(x))
             
-            mapping_dict_friendly_names = dict(zip(def_fields_final[0].tolist(), abc_touse))
+            mapping_dict_friendly_names = dict(zip(def_fields_final['cleaned'].tolist(), abc_touse))
+            mapping_dict_original_names = dict(zip(abc_touse, def_fields_final['original'].tolist()))  # Map abbrev to original names
             mapping_dict = dict(zip(def_fields_final['aa'].tolist(), abc_touse))
             
             # Process calculated fields - filter to only include fields used in the report
@@ -303,6 +313,9 @@ class TableauExtractorGUI:
             
             nlsi = ['x___' + i for i in collated_abc]
             nlsi_to_use = nlsi[0:len(created_calc)]
+            
+            # Store original field names BEFORE cleaning
+            created_calc['field_name_original'] = created_calc['field_name'].copy()
             
             created_calc['field_name'] = created_calc['field_name'].apply(remove_sp_char_leave_undescore_square_brackets)
             created_calc['aa'] = created_calc.apply(lambda row: first_char_checker(row['field_id']), axis=1)
@@ -320,6 +333,7 @@ class TableauExtractorGUI:
             
             created_calc['field_name'] = differentiate_duplicates(created_calc['field_name'])
             calc_map_dict_friendly_names = dict(zip(created_calc['field_name'], created_calc['shorthand_abc']))
+            calc_map_dict_original_names = dict(zip(created_calc['shorthand_abc'], created_calc['field_name_original']))  # Map abbrev to original names
             
             # Create lineage paths
             def create_lineage_paths(df, field_type):
@@ -368,32 +382,32 @@ class TableauExtractorGUI:
             edges = []
             node_ids = set()
             
-            # Add default fields as nodes
-            for i, d in mapping_dict_friendly_names.items():
-                if d not in node_ids:
+            # Add default fields as nodes (use original names for labels)
+            for abbrev, original_name in mapping_dict_original_names.items():
+                if abbrev not in node_ids:
                     nodes.append({
-                        'id': d,
-                        'label': i,
+                        'id': abbrev,
+                        'label': original_name,
                         'group': 'default',
-                        'title': f'Default Field: {i}'
+                        'title': f'Default Field: {original_name}'
                     })
-                    node_ids.add(d)
+                    node_ids.add(abbrev)
             
-            # Add calculated fields as nodes
-            for i, d in calc_map_dict_friendly_names.items():
-                if d not in node_ids:
-                    calc_row = created_calc[created_calc['field_name'] == i]
+            # Add calculated fields as nodes (use original names for labels)
+            for abbrev, original_name in calc_map_dict_original_names.items():
+                if abbrev not in node_ids:
+                    calc_row = created_calc[created_calc['shorthand_abc'] == abbrev]
                     calc_formula = ''
-                    if not calc_row.empty and not pd.isna(calc_row['field_calculation'].values[0]):
+                    if not calc_row.empty and calc_row['field_calculation'].values[0]:
                         calc_formula = str(calc_row['field_calculation'].values[0])
                     
                     nodes.append({
-                        'id': d,
-                        'label': i,
+                        'id': abbrev,
+                        'label': original_name,
                         'group': 'calculated',
-                        'title': f'{i}\n\nFormula:\n{calc_formula}'
+                        'title': f'{original_name}\n\nFormula:\n{calc_formula}'
                     })
-                    node_ids.add(d)
+                    node_ids.add(abbrev)
             
             # Build edges
             for item in t_collator_def_fields:
