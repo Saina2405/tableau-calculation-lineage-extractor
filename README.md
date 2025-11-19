@@ -107,13 +107,16 @@ python "Tableau calculation and lineage extractor.py"
 
 | File | Purpose |
 |------|------|
-| `tableau_extractor_gui.exe` | **GUI executable** - Windows application (no Python needed) |
-| `tableau_extractor_gui.py` | GUI source code (Tkinter interface) |
+| `dist/tableau_extractor_gui.exe` | **GUI executable** - Windows application (no Python needed) |
+| `Tableau_extractor_gui.py` | GUI source code (Tkinter interface) |
 | `Tableau calculation and lineage extractor.py` | Standalone command-line Python script (v3.1) |
 | `Tableau calculation and lineage extractor.ipynb` | Jupyter Notebook version with markdown documentation |
 | `Excelcreator.py` | Helper module for Excel formatting with xlsxwriter |
 | `tableau_extractor_gui.spec` | PyInstaller build configuration for GUI executable |
-| `convert_md_to_docx.py` | Utility to convert markdown documentation to Word format |
+| `Tableau calculation and lineage extractor.spec` | PyInstaller build configuration for main script |
+| `inputs/` | Folder for Tableau workbook files (.twb/.twbx) |
+| `outputs/` | Folder for generated Excel and HTML files |
+
 
 
 
