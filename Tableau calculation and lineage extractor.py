@@ -215,7 +215,7 @@ df1['Field_Name'] = df1['Field_Name'].str.replace(r'[\[\]]', '', regex=True)
 
 # Clean the Worksheets column - convert list to comma-separated string without brackets
 def format_worksheets(ws_list):
-    if ws_list and len(ws_list) > 0:
+    if ws_list and isinstance(ws_list, list) and len(ws_list) > 0:
         # Join worksheet names with comma and space
         return ', '.join(ws_list)
     return ''
