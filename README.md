@@ -40,32 +40,6 @@ pyinstaller
 
 ```
 
-## 🚀 Quick Start
-
-### **Option 1: Use the GUI (Recommended for non-technical users)**
-
-1. Run `tableau_extractor_gui.exe` (located in `dist/` folder)
-2. Click "Browse" to select your Tableau workbook (`.twb` or `.twbx`)
-3. Choose output directory (defaults to `outputs/` folder)
-4. Check desired output options:
-   - ☑ Generate Excel
-   - ☑ Generate Lineage Diagram
-5. Click "Process Workbook"
-6. Find results in the output folder
-
-### **Option 2: Run Python Script**
-
-```bash
-# Place your .twb/.twbx file in the "inputs" folder
-# NOTE: The script processes the first .twb/.twbx file it finds
-# If adding a new workbook, empty the inputs folder first or remove old files
-
-# Run the extractor (updated filename)
-python "Tableau calculation and lineage extractor.py"
-
-# Check "outputs" folder for results
-```
-
 ## 🔧 How It Works
 
 ### Data Extraction Process
@@ -102,6 +76,32 @@ python "Tableau calculation and lineage extractor.py"
 ❌ **No credentials**: Does not access database passwords or connection strings  
 ❌ **No external calls**: Operates entirely offline on local files  
 
+
+## 🚀 Quick Start
+
+### **Option 1: Use the GUI (Recommended for non-technical users)**
+
+1. Run `tableau_extractor_gui.exe` (located in `dist/` folder)
+2. Click "Browse" to select your Tableau workbook (`.twb` or `.twbx`)
+3. Choose output directory (defaults to `outputs/` folder)
+4. Check desired output options:
+   - ☑ Generate Excel
+   - ☑ Generate Lineage Diagram
+5. Click "Process Workbook"
+6. Find results in the output folder
+
+### **Option 2: Run Python Script**
+
+```bash
+# Place your .twb/.twbx file in the "inputs" folder
+# NOTE: The script processes the first .twb/.twbx file it finds
+# If adding a new workbook, empty the inputs folder first or remove old files
+
+# Run the extractor (updated filename)
+python "Tableau calculation and lineage extractor.py"
+
+# Check "outputs" folder for results
+```
 
 ## 📝 Files Explained
 
