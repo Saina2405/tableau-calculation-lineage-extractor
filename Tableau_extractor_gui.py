@@ -184,9 +184,8 @@ class TableauExtractorGUI:
                     try:
                         field_id = field.id if field.id else f"[{field.name}]"
                         
-                        # Extract worksheet names from field.worksheets
-                        worksheets = getattr(field, 'worksheets', [])
-                        worksheet_names = ', '.join([ws.name if hasattr(ws, 'name') else str(ws) for ws in worksheets]) if worksheets else ''
+                        # Store worksheets as a list (will be formatted later)
+                        worksheet_names = field.worksheets if hasattr(field, 'worksheets') and field.worksheets else []
                         
                         dict_temp = {
                             'counter': c,
