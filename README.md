@@ -97,19 +97,16 @@ pyinstaller
 
 ### **Option 2: Run Python Script**
 
-```bash
-# 1. Ensure Python environment is set up (Python 3.7+)
-# 2. Install all required packages/libraries mentioned above:
-# 3. Download all project files into your preferred directory
-# 4. Place your .twb/.twbx file in the "inputs" folder
-# NOTE: The script processes the first .twb/.twbx file it finds
-# If adding a new workbook, empty the inputs folder first or remove old files
-
-# 5. Run the extractor
+1. Ensure Python environment is set up (Python 3.7+)
+2. Install all required packages/libraries mentioned above:
+3. Download all project files into your preferred directory
+4. Place your .twb/.twbx file in the "inputs" folder
+   NOTE: The script processes the first .twb/.twbx file it finds
+   If adding a new workbook, empty the inputs folder first or remove old files
+5. Run the extractor
 python "Tableau calculation and lineage extractor.py"
+6. Check "outputs" folder for results
 
-# 6. Check "outputs" folder for results
-```
 
 ## 📝 Files Explained
 
