@@ -49,7 +49,7 @@ pyinstaller
 2. **Parses XML structure** using Tableau Document API
 3. **Extracts metadata from XML**:
    - Field names and internal IDs
-   - Calculation formulas (with field ID references)
+   - Calculation formulas
    - Data types
    - Worksheet usage information
    - Associated datasource information
@@ -98,14 +98,17 @@ pyinstaller
 ### **Option 2: Run Python Script**
 
 ```bash
-# Place your .twb/.twbx file in the "inputs" folder
+# 1. Ensure Python environment is set up (Python 3.7+)
+# 2. Install all required packages/libraries mentioned above:
+# 3. Download all project files into your preferred directory
+# 4. Place your .twb/.twbx file in the "inputs" folder
 # NOTE: The script processes the first .twb/.twbx file it finds
 # If adding a new workbook, empty the inputs folder first or remove old files
 
-# Run the extractor (updated filename)
+# 5. Run the extractor
 python "Tableau calculation and lineage extractor.py"
 
-# Check "outputs" folder for results
+# 6. Check "outputs" folder for results
 ```
 
 ## 📝 Files Explained
